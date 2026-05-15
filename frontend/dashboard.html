@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div class="navbar">
+
+    <div>
+        <div class="logo">TODO TASK</div>
+        <p class="welcome" id="welcome"></p>
+    </div>
+
+    <div class="top-actions">
+
+        <button class="theme-btn" onclick="toggleTheme()">
+            Dark Mode
+        </button>
+
+        <button class="logout-btn" onclick="logout()">
+            Logout
+        </button>
+
+    </div>
+
+</div>
+
+<div class="dashboard container">
+
+    <div class="card">
+
+        <h2>Create Task</h2>
+
+        <input
+            type="text"
+            id="taskTitle"
+            placeholder="Enter task name"
+        >
+
+        <div class="toggle-wrapper">
+
+            <span>Completed</span>
+
+            <label class="switch">
+
+                <input type="checkbox" id="completed">
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+        <button class="main-btn" onclick="createTask()">
+            Create Task
+        </button>
+
+    </div>
+
+    <div id="adminSection"></div>
+
+    <div class="task-grid" id="taskList"></div>
+
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/dashboard.js"></script>
+
+</body>
+</html>
