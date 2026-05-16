@@ -1,35 +1,47 @@
-
 async function login() {
 
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
-    const response = await fetch(LOGIN_API, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            username,
-            password
-        })
-    });
+    try {
 
-    const data = await response.json();
+        const response = await fetch(LOGIN_API, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username,
+                password
+            })
+        });
 
-    if (response.ok) {
+        let data = null;
 
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("username", username);
+        try {
+            data = await response.json();
+        } catch (e) {
+            console.log("No JSON response from backend");
+        }
 
-        // extract role from JWT
-        const payload = JSON.parse(atob(data.token.split('.')[1]));
-        localStorage.setItem("role", payload.role);
+        if (response.ok) {
 
-        window.location.href = "dashboard.html";
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("username", username);
 
-    } else {
+            const payload = JSON.parse(atob(data.token.split('.')[1]));
+            localStorage.setItem("role", payload.role);
+
+            window.location.href = "dashboard.html";
+
+        } else {
+            document.getElementById("message").innerText =
+                data?.message || "Invalid credentials";
+        }
+
+    } catch (error) {
         document.getElementById("message").innerText =
-            "Invalid credentials";
+            "Server not reachable";
+        console.log(error);
     }
 }

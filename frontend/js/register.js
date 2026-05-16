@@ -11,26 +11,33 @@ async function register() {
         return;
     }
 
-    const response = await fetch(REGISTER_API, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            username,
-            password
-        })
-    });
+    try {
 
-    if (response.ok) {
+        const response = await fetch(REGISTER_API, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username,
+                password
+            })
+        });
 
-        message.innerText = "Successfully registered. Redirecting...";
+        if (response.ok) {
 
-        setTimeout(() => {
-            window.location.href = "login.html";
-        }, 2000);
+            message.innerText = "Registered successfully... Redirecting";
 
-    } else {
-        message.innerText = "Registration failed";
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 2000);
+
+        } else {
+            message.innerText = "Registration failed";
+        }
+
+    } catch (error) {
+        message.innerText = "Server error";
+        console.log(error);
     }
 }
