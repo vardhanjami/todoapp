@@ -4,6 +4,7 @@ window.login = async function () {
 
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
+    const message = document.getElementById("message");
 
     try {
         const response = await fetch(LOGIN_API, {
@@ -19,9 +20,7 @@ window.login = async function () {
         let data = {};
         try {
             data = text ? JSON.parse(text) : {};
-        } catch (e) {
-            console.log("Non JSON response:", text);
-        }
+        } catch (e) {}
 
         if (response.ok) {
 
@@ -34,13 +33,10 @@ window.login = async function () {
             window.location.href = "dashboard.html";
 
         } else {
-            document.getElementById("message").innerText =
-                data.message || "Login failed";
+            message.innerText = "Login failed";
         }
 
     } catch (err) {
-        console.error(err);
-        document.getElementById("message").innerText =
-            "Server not reachable";
+        message.innerText = "Server error";
     }
 };

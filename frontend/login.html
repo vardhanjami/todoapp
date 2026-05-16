@@ -13,11 +13,20 @@
 
     <input type="text" id="username" placeholder="Username">
 
-    <input type="password" id="password" placeholder="Password">
+<input type="password" id="password" placeholder="Password">
 
-    <button onclick="login()">Login</button>
+<button type="button" onclick="togglePassword()">Show/Hide</button>
 
-    <p id="message"></p>
+<button onclick="login()">Login</button>
+
+<p id="message"></p>
+
+<script>
+function togglePassword() {
+    const pass = document.getElementById("password");
+    pass.type = pass.type === "password" ? "text" : "password";
+}
+</script>
 
     <p style="margin-top:15px;">
         No account?

@@ -12,13 +12,22 @@
 
     <input type="text" id="username" placeholder="Username">
 
-    <input type="password" id="password" placeholder="Password">
+<input type="password" id="password" placeholder="Password">
+<button type="button" onclick="togglePassword('password')">Show</button>
 
-    <input type="password" id="confirmPassword" placeholder="Confirm Password">
+<input type="password" id="confirmPassword" placeholder="Confirm Password">
+<button type="button" onclick="togglePassword('confirmPassword')">Show</button>
 
-    <button onclick="register()">Register</button>
+<button onclick="register()">Register</button>
 
-    <p id="message"></p>
+<p id="message"></p>
+
+<script>
+function togglePassword(id) {
+    const input = document.getElementById(id);
+    input.type = input.type === "password" ? "text" : "password";
+}
+</script>
 
     <p style="margin-top:15px;">
         Already have account?
