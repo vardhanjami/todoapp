@@ -1,27 +1,28 @@
+const BASE_URL = "https://todoapp-gxde.onrender.com";
+const LOGIN_API = `${BASE_URL}/auth/login`;
+
 async function login() {
 
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
     try {
-
         const response = await fetch(LOGIN_API, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                username,
-                password
-            })
+            body: JSON.stringify({ username, password })
         });
 
-        let data = null;
+        // IMPORTANT: read safely
+        const text = await response.text();
 
+        let data = {};
         try {
-            data = await response.json();
+            data = text ? JSON.parse(text) : {};
         } catch (e) {
-            console.log("No JSON response from backend");
+            console.log("Non JSON response:", text);
         }
 
         if (response.ok) {
@@ -36,12 +37,12 @@ async function login() {
 
         } else {
             document.getElementById("message").innerText =
-                data?.message || "Invalid credentials";
+                data.message || "Login failed (check backend logs)";
         }
 
-    } catch (error) {
+    } catch (err) {
+        console.error(err);
         document.getElementById("message").innerText =
             "Server not reachable";
-        console.log(error);
     }
 }
