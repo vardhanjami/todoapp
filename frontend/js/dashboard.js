@@ -1,48 +1,35 @@
-const BASE_URL = "https://todoapp-gxde.onrender.com";
-
-const TASK_API = `${BASE_URL}/tasks`;
-const ADMIN_USERS_API = `${BASE_URL}/admin/users`;
-const ADMIN_TASKS_API = `${BASE_URL}/admin/tasks`;
-
-function getToken() {
-    return localStorage.getItem("token");
-}
-
-function authHeaders() {
-    return {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + getToken()
-    };
-}
+const TASK_API = BASE_URL + "/tasks";
+const ADMIN_USERS_API = BASE_URL + "/admin/users";
+const ADMIN_TASKS_API = BASE_URL + "/admin/tasks";
 
 // ---------------- AUTH CHECK ----------------
 if (!localStorage.getItem("token")) {
     window.location.href = "login.html";
 }
 
-document.getElementById("welcome").innerText =
-    "Welcome " + localStorage.getItem("username");
+window.addEventListener("DOMContentLoaded", () => {
 
-// ---------------- ADMIN UI ----------------
-const role = localStorage.getItem("role");
+    document.getElementById("welcome").innerText =
+        "Welcome " + localStorage.getItem("username");
 
-if (role === "ADMIN") {
+    const role = localStorage.getItem("role");
 
-    document.getElementById("adminSection").innerHTML = `
-        <div class="card" style="margin-top:20px;">
-            <h2>ADMIN PANEL</h2>
-            <p>You have administrator access.</p>
+    if (role === "ADMIN") {
+        document.getElementById("adminSection").innerHTML = `
+            <div class="card">
+                <h2>ADMIN PANEL</h2>
+                <button onclick="loadAllUsers()">Load Users</button>
+                <button onclick="loadAllTasks()">Load Tasks</button>
+                <div id="adminData"></div>
+            </div>
+        `;
+    }
 
-            <button onclick="loadAllUsers()">Load All Users</button>
-            <button onclick="loadAllTasks()">Load All Tasks</button>
-
-            <div id="adminData"></div>
-        </div>
-    `;
-}
+    fetchTasks();
+});
 
 // ---------------- TASKS ----------------
-async function fetchTasks() {
+window.fetchTasks = async function () {
 
     const response = await fetch(TASK_API, {
         headers: authHeaders()
@@ -54,32 +41,21 @@ async function fetchTasks() {
     taskList.innerHTML = "";
 
     tasks.forEach(task => {
-
         taskList.innerHTML += `
-        <div class="task-card ${task.completed ? 'completed-task' : ''}">
-            <div class="task-title">${task.title}</div>
+        <div class="task-card">
+            <div>${task.title}</div>
+            <div>${task.completed ? "Done" : "Pending"}</div>
 
-            <p class="${task.completed ? 'completed' : 'pending'}">
-                ${task.completed ? 'Completed' : 'Pending'}
-            </p>
-
-            <div class="actions">
-                <button onclick="deleteTask(${task.id})">Delete</button>
-
-                <button onclick="toggleTask(
-                    ${task.id},
-                    '${task.title}',
-                    ${task.completed}
-                )">
-                    Toggle
-                </button>
-            </div>
+            <button onclick="deleteTask(${task.id})">Delete</button>
+            <button onclick="toggleTask(${task.id}, '${task.title}', ${task.completed})">
+                Toggle
+            </button>
         </div>
         `;
     });
-}
+};
 
-async function createTask() {
+window.createTask = async function () {
 
     const title = document.getElementById("taskTitle").value;
     const completed = document.getElementById("completed").checked;
@@ -92,9 +68,9 @@ async function createTask() {
 
     document.getElementById("taskTitle").value = "";
     fetchTasks();
-}
+};
 
-async function deleteTask(id) {
+window.deleteTask = async function (id) {
 
     await fetch(`${TASK_API}/${id}`, {
         method: "DELETE",
@@ -102,92 +78,59 @@ async function deleteTask(id) {
     });
 
     fetchTasks();
-}
+};
 
-async function toggleTask(id, title, currentStatus) {
+window.toggleTask = async function (id, title, status) {
 
     await fetch(`${TASK_API}/${id}`, {
         method: "PUT",
         headers: authHeaders(),
         body: JSON.stringify({
             title,
-            completed: !currentStatus
+            completed: !status
         })
     });
 
     fetchTasks();
-}
+};
 
 // ---------------- ADMIN ----------------
-async function loadAllUsers() {
+window.loadAllUsers = async function () {
 
-    const response = await fetch(ADMIN_USERS_API, {
+    const res = await fetch(ADMIN_USERS_API, {
         headers: authHeaders()
     });
 
-    const users = await response.json();
+    const users = await res.json();
 
-    let html = "<h3>Users</h3>";
+    document.getElementById("adminData").innerHTML =
+        users.map(u => `
+            <div class="card">
+                <p>${u.username}</p>
+                <p>${u.role}</p>
+            </div>
+        `).join("");
+};
 
-    users.forEach(user => {
-        html += `
-        <div class="card">
-            <p><b>ID:</b> ${user.id}</p>
-            <p><b>Username:</b> ${user.username}</p>
-            <p><b>Role:</b> ${user.role}</p>
-        </div>
-        `;
-    });
+window.loadAllTasks = async function () {
 
-    document.getElementById("adminData").innerHTML = html;
-}
-
-async function loadAllTasks() {
-
-    const response = await fetch(ADMIN_TASKS_API, {
+    const res = await fetch(ADMIN_TASKS_API, {
         headers: authHeaders()
     });
 
-    const tasks = await response.json();
+    const tasks = await res.json();
 
-    let html = "<h3>All Tasks</h3>";
-
-    tasks.forEach(task => {
-        html += `
-        <div class="card">
-            <p><b>Task:</b> ${task.title}</p>
-            <p><b>Status:</b> ${task.completed ? "Completed" : "Pending"}</p>
-        </div>
-        `;
-    });
-
-    document.getElementById("adminData").innerHTML = html;
-}
+    document.getElementById("adminData").innerHTML =
+        tasks.map(t => `
+            <div class="card">
+                <p>${t.title}</p>
+                <p>${t.completed ? "Done" : "Pending"}</p>
+            </div>
+        `).join("");
+};
 
 // ---------------- LOGOUT ----------------
-function logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("username");
-    localStorage.removeItem("role");
+window.logout = function () {
+    localStorage.clear();
     window.location.href = "login.html";
-}
-
-// ---------------- THEME ----------------
-function toggleTheme() {
-    document.body.classList.toggle("light-mode");
-
-    if (document.body.classList.contains("light-mode")) {
-        localStorage.setItem("theme", "light");
-    } else {
-        localStorage.setItem("theme", "dark");
-    }
-}
-
-window.onload = () => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "light") {
-        document.body.classList.add("light-mode");
-    }
-
-    fetchTasks();
 };
