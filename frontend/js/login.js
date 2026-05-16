@@ -1,20 +1,15 @@
-const LOGIN_API = "http://localhost:8080/auth/login";
 
-async function login(){
+async function login() {
 
     const username = document.getElementById("username").value;
-
     const password = document.getElementById("password").value;
 
-    const response = await fetch(LOGIN_API,{
-
-        method:"POST",
-
-        headers:{
-            "Content-Type":"application/json"
+    const response = await fetch(LOGIN_API, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
         },
-
-        body:JSON.stringify({
+        body: JSON.stringify({
             username,
             password
         })
@@ -22,21 +17,18 @@ async function login(){
 
     const data = await response.json();
 
-    if(response.ok){
+    if (response.ok) {
 
         localStorage.setItem("token", data.token);
-
         localStorage.setItem("username", username);
 
-        // EXTRACT ROLE FROM JWT
+        // extract role from JWT
         const payload = JSON.parse(atob(data.token.split('.')[1]));
-
         localStorage.setItem("role", payload.role);
 
         window.location.href = "dashboard.html";
 
-    }else{
-
+    } else {
         document.getElementById("message").innerText =
             "Invalid credentials";
     }
